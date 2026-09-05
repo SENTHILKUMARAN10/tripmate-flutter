@@ -1,34 +1,48 @@
-# TripMate — Smart Travel Planner
+# TripMate — Premium Social Travel Companion
 
-TripMate is a real-time Flutter travel planning app backed by Supabase.
+TripMate is a real-time Flutter + Supabase travel companion designed as an all-in-one space for planning, travelling, collaborating and preserving memories.
 
-## Features
+## Core travel features
 - Email signup / login
-- Real-time trip list
-- Create and delete trips
-- Day-by-day itinerary activities
+- Real-time trips
+- Premium home dashboard
+- Day-by-day itinerary
 - Budget and expense tracking
-- Packing / travel checklist
-- Supabase PostgreSQL persistence
-- Row Level Security per user
-- Realtime database updates
+- Packing and travel checklist
+- Bookings and reservation details
+- Memorable Moments photo journal
+- Important notes and emergency information
+- Travel tools
+- Secure Travel Vault for IDs, tickets and documents
+- End-of-trip Story Studio for shareable travel recaps
+
+## Social + Gen Z layer
+- Unique usernames and profiles
+- Friend search and requests
+- Trip Crew / tag travel companions
+- Direct messaging
+- TripVerse discovery
+- Vibe Drops
+- Pull-to-refresh
+- Premium icon-only bottom navigation
+- Profile and Settings pages
+
+## Backend
+Supabase provides Authentication, PostgreSQL, Realtime, Storage and Row Level Security.
+
+Database migrations are stored under `supabase/migrations/`.
 
 ## Automated Android build
-GitHub Actions is configured to generate the Android platform files, analyze the Flutter project, build a release APK, and upload it as the `TripMate-Android-APK` artifact.
+GitHub Actions generates the Android platform files, analyzes the Flutter project, builds a release APK and uploads it as the `TripMate-Android-APK` artifact.
 
 ## Local setup
-On a computer with Flutter installed:
-
 ```bash
 flutter create . --platforms=android,ios --project-name=tripmate --org=com.senthilkumaran.tripmate
 flutter pub get
 flutter run
 ```
 
-## Supabase
-The app is connected to the TripMate Supabase backend. The database schema is stored in `supabase/schema.sql`, with a production migration under `supabase/migrations/`.
-
-## Android release build
+## Release build
 ```bash
 flutter build apk --release
 ```
@@ -37,6 +51,3 @@ For Play Store:
 ```bash
 flutter build appbundle --release
 ```
-
-## Current product scope
-The app includes the core real-time data model and primary user workflows. Planned production extensions include maps/place search, trip sharing, push notifications, image storage, offline caching, currency conversion and collaborative trips.
