@@ -305,7 +305,7 @@ class _DocumentDetailsSheetState extends State<_DocumentDetailsSheet> {
           const SizedBox(height: 18),
           TextField(controller: title, decoration: const InputDecoration(labelText: 'Document name', prefixIcon: Icon(Icons.edit_note_rounded))),
           const SizedBox(height: 12),
-          DropdownButtonFormField<String>(value: category, items: categories.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) => setState(() => category = v ?? 'Other'), decoration: const InputDecoration(labelText: 'Category', prefixIcon: Icon(Icons.category_outlined))),
+          DropdownButtonFormField<String>(initialValue: category, items: categories.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) => setState(() => category = v ?? 'Other'), decoration: const InputDecoration(labelText: 'Category', prefixIcon: Icon(Icons.category_outlined))),
           const SizedBox(height: 18),
           FilledButton(onPressed: () { if (title.text.trim().isNotEmpty) Navigator.pop(context, _DocDetails(title.text.trim(), category)); }, child: const Text('Save securely')),
         ]),
