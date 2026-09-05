@@ -21,6 +21,9 @@ jobs:
       - name: Generate Android platform files
         run: flutter create . --platforms=android --project-name=tripmate --org=com.senthilkumaran.tripmate
 
+      - name: Remove generated sample test
+        run: rm -f test/widget_test.dart
+
       - name: Get packages
         run: flutter pub get
 
