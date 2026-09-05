@@ -1,9 +1,12 @@
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 import '../models/trip.dart';
 
 class TripService {
   TripService(this.client);
   final SupabaseClient client;
+  static const _uuid = Uuid();
 
   String get userId => client.auth.currentUser!.id;
 
@@ -69,6 +72,10 @@ class TripService {
     });
   }
 
+  Future<void> deleteItinerary(String id) async {
+    await client.from('itinerary_items').delete().eq('id', id).eq('user_id', userId);
+  }
+
   Stream<List<Map<String, dynamic>>> watchExpenses(String tripId) {
     return client
         .from('expenses')
@@ -91,6 +98,10 @@ class TripService {
       'amount': amount,
       'spent_at': DateTime.now().toIso8601String(),
     });
+  }
+
+  Future<void> deleteExpense(String id) async {
+    await client.from('expenses').delete().eq('id', id).eq('user_id', userId);
   }
 
   Stream<List<Map<String, dynamic>>> watchChecklist(String tripId) {
@@ -116,5 +127,113 @@ class TripService {
         .update({'is_done': done})
         .eq('id', id)
         .eq('user_id', userId);
+  }
+
+  Future<void> deleteChecklistItem(String id) async {
+    await client.from('checklist_items').delete().eq('id', id).eq('user_id', userId);
+  }
+
+  Stream<List<Map<String, dynamic>>> watchMemories(String tripId) {
+    return client
+        .from('trip_memories')
+        .stream(primaryKey: ['id'])
+        .eq('trip_id', tripId)
+        .order('taken_at', ascending: false);
+  }
+
+  Future<void> addMemory({
+    required String tripId,
+    required XFile file,
+    String? caption,
+  }) async {
+    final bytes = await file.readAsBytes();
+    final original = file.name.toLowerCase();
+    final ext = original.contains('.') ? original.split('.').last : 'jpg';
+    final safeExt = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'].contains(ext) ? ext : 'jpg';
+    final storagePath = '$userId/$tripId/${_uuid.v4()}.$safeExt';
+    await client.storage.from('trip-memories').uploadBinary(
+          storagePath,
+          bytes,
+          fileOptions: const FileOptions(upsert: false),
+        );
+    await client.from('trip_memories').insert({
+      'trip_id': tripId,
+      'user_id': userId,
+      'caption': caption?.trim().isEmpty == true ? null : caption?.trim(),
+      'storage_path': storagePath,
+      'taken_at': DateTime.now().toIso8601String(),
+    });
+  }
+
+  Future<String> memoryUrl(String storagePath) {
+    return client.storage.from('trip-memories').createSignedUrl(storagePath, 3600);
+  }
+
+  Future<void> deleteMemory(Map<String, dynamic> memory) async {
+    final path = memory['storage_path'] as String?;
+    if (path != null && path.isNotEmpty) {
+      await client.storage.from('trip-memories').remove([path]);
+    }
+    await client.from('trip_memories').delete().eq('id', memory['id']).eq('user_id', userId);
+  }
+
+  Stream<List<Map<String, dynamic>>> watchBookings(String tripId) {
+    return client
+        .from('trip_bookings')
+        .stream(primaryKey: ['id'])
+        .eq('trip_id', tripId)
+        .order('created_at', ascending: false);
+  }
+
+  Future<void> addBooking({
+    required String tripId,
+    required String title,
+    required String category,
+    String? provider,
+    String? confirmationCode,
+    DateTime? startsAt,
+    String? notes,
+  }) async {
+    await client.from('trip_bookings').insert({
+      'trip_id': tripId,
+      'user_id': userId,
+      'title': title,
+      'category': category,
+      'provider': provider,
+      'confirmation_code': confirmationCode,
+      'starts_at': startsAt?.toIso8601String(),
+      'notes': notes,
+    });
+  }
+
+  Future<void> deleteBooking(String id) async {
+    await client.from('trip_bookings').delete().eq('id', id).eq('user_id', userId);
+  }
+
+  Stream<List<Map<String, dynamic>>> watchNotes(String tripId) {
+    return client
+        .from('trip_notes')
+        .stream(primaryKey: ['id'])
+        .eq('trip_id', tripId)
+        .order('created_at', ascending: false);
+  }
+
+  Future<void> addNote({
+    required String tripId,
+    required String title,
+    String? body,
+    String kind = 'note',
+  }) async {
+    await client.from('trip_notes').insert({
+      'trip_id': tripId,
+      'user_id': userId,
+      'title': title,
+      'body': body,
+      'kind': kind,
+    });
+  }
+
+  Future<void> deleteNote(String id) async {
+    await client.from('trip_notes').delete().eq('id', id).eq('user_id', userId);
   }
 }
