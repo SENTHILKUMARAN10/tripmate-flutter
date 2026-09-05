@@ -107,7 +107,8 @@ class _CircleScreenState extends State<CircleScreen> {
                       profile: p,
                       onAdd: () async {
                         await social.sendFriendRequest(p['id'] as String);
-                        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Friend request sent to @${p['username']}')));
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Friend request sent to @${p['username']}')));
                       },
                       onMessage: () => _message(p),
                     )),
