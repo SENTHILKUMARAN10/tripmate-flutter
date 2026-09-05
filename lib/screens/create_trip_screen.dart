@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/trip_service.dart';
 
@@ -38,10 +39,11 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   }
 
   Future<void> save() async {
-    if (title.text.trim().isEmpty ||
-        destination.text.trim().isEmpty ||
-        start == null ||
-        end == null) return;
+    FocusScope.of(context).unfocus();
+    if (title.text.trim().isEmpty || destination.text.trim().isEmpty || start == null || end == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add a trip name, destination and travel dates.')));
+      return;
+    }
 
     setState(() => saving = true);
     try {
@@ -56,65 +58,132 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
       );
       if (mounted) Navigator.pop(context, trip);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Could not create trip: $e')));
-      }
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not create trip: $e')));
     } finally {
       if (mounted) setState(() => saving = false);
     }
   }
 
   @override
+  void dispose() {
+    title.dispose();
+    destination.dispose();
+    budget.dispose();
+    notes.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tripDays = start != null && end != null ? end!.difference(start!).inDays + 1 : null;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Create trip')),
+      appBar: AppBar(title: const Text('Plan a new trip')),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(16, 6, 16, 110),
         children: [
-          TextField(controller: title, decoration: const InputDecoration(labelText: 'Trip name')),
-          const SizedBox(height: 12),
-          TextField(controller: destination, decoration: const InputDecoration(labelText: 'Destination')),
-          const SizedBox(height: 12),
-          Row(children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => pickDate(true),
-                icon: const Icon(Icons.calendar_month),
-                label: Text(start == null ? 'Start date' : '${start!.day}/${start!.month}/${start!.year}'),
-              ),
+          Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [Color(0xFF244B45), Color(0xFF5D8179)]),
+              borderRadius: BorderRadius.circular(28),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => pickDate(false),
-                icon: const Icon(Icons.event),
-                label: Text(end == null ? 'End date' : '${end!.day}/${end!.month}/${end!.year}'),
-              ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.explore_rounded, color: Color(0xFFFFC8A6), size: 34),
+                SizedBox(height: 16),
+                Text('Turn an idea into a journey.', style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w900, letterSpacing: -.5)),
+                SizedBox(height: 7),
+                Text('Start with the basics. You can build the itinerary, bookings, packing list, budget and memories inside the trip later.', style: TextStyle(color: Colors.white70, height: 1.45)),
+              ],
             ),
-          ]),
+          ),
+          const SizedBox(height: 22),
+          Text('Trip essentials', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
+          TextField(
+            controller: title,
+            textCapitalization: TextCapitalization.words,
+            decoration: const InputDecoration(labelText: 'Trip name', hintText: 'Weekend escape', prefixIcon: Icon(Icons.auto_awesome_rounded)),
+          ),
+          const SizedBox(height: 11),
+          TextField(
+            controller: destination,
+            textCapitalization: TextCapitalization.words,
+            decoration: const InputDecoration(labelText: 'Destination', hintText: 'Ooty, Goa, Bali...', prefixIcon: Icon(Icons.place_rounded)),
+          ),
+          const SizedBox(height: 18),
+          Text('Travel dates', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(child: _DateCard(label: 'Start', value: start, icon: Icons.flight_takeoff_rounded, onTap: () => pickDate(true))),
+              const SizedBox(width: 10),
+              Expanded(child: _DateCard(label: 'End', value: end, icon: Icons.flight_land_rounded, onTap: () => pickDate(false))),
+            ],
+          ),
+          if (tripDays != null) ...[
+            const SizedBox(height: 8),
+            Text('$tripDays-day journey', style: TextStyle(color: cs.primary, fontWeight: FontWeight.w800)),
+          ],
+          const SizedBox(height: 20),
+          Text('Money & notes', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 10),
           TextField(
             controller: budget,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Budget', prefixText: '₹ '),
+            decoration: const InputDecoration(labelText: 'Estimated budget', prefixText: '₹ ', prefixIcon: Icon(Icons.account_balance_wallet_rounded)),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 11),
           TextField(
             controller: notes,
-            maxLines: 4,
-            decoration: const InputDecoration(labelText: 'Notes'),
+            minLines: 3,
+            maxLines: 5,
+            decoration: const InputDecoration(labelText: 'Trip note (optional)', hintText: 'Why are you taking this trip? Any important plan?', prefixIcon: Icon(Icons.notes_rounded)),
           ),
-          const SizedBox(height: 20),
-          FilledButton(
+          const SizedBox(height: 22),
+          FilledButton.icon(
             onPressed: saving ? null : save,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              child: Text(saving ? 'Creating...' : 'Create trip'),
-            ),
-          )
+            icon: saving
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Icon(Icons.arrow_forward_rounded),
+            label: Text(saving ? 'Creating trip...' : 'Create trip space'),
+          ),
         ],
       ),
     );
   }
+}
+
+class _DateCard extends StatelessWidget {
+  const _DateCard({required this.label, required this.value, required this.icon, required this.onTap});
+  final String label;
+  final DateTime? value;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant)),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(height: 12),
+                Text(label, style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 3),
+                Text(value == null ? 'Choose date' : DateFormat.MMMd().format(value!), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
+              ],
+            ),
+          ),
+        ),
+      );
 }
