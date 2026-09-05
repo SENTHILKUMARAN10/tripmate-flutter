@@ -13,47 +13,30 @@ TripMate is a real-time Flutter travel planning app backed by Supabase.
 - Row Level Security per user
 - Realtime database updates
 
-## 1. Create the Flutter platform folders
-This source intentionally contains the portable app code. On a computer with Flutter installed:
+## Automated Android build
+GitHub Actions is configured to generate the Android platform files, analyze the Flutter project, build a release APK, and upload it as the `TripMate-Android-APK` artifact.
+
+## Local setup
+On a computer with Flutter installed:
 
 ```bash
-flutter create . --platforms=android,ios
+flutter create . --platforms=android,ios --project-name=tripmate --org=com.senthilkumaran.tripmate
 flutter pub get
+flutter run
 ```
 
-If Flutter adds/replaces `lib/main.dart`, restore the `lib/` folder from this project after running `flutter create .`.
+## Supabase
+The app is connected to the TripMate Supabase backend. The database schema is stored in `supabase/schema.sql`, with a production migration under `supabase/migrations/`.
 
-## 2. Create a Supabase project
-Create a new Supabase project for TripMate.
-
-Open **SQL Editor** and run:
-
-`supabase/schema.sql`
-
-In **Authentication → Providers → Email**, keep Email enabled.
-
-## 3. Run the app
-Use the Supabase project URL and Publishable/Anon key:
-
+## Android release build
 ```bash
-flutter run \
-  --dart-define=SUPABASE_URL=https://YOUR_PROJECT.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
-```
-
-## 4. Android release build
-```bash
-flutter build apk --release \
-  --dart-define=SUPABASE_URL=https://YOUR_PROJECT.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
+flutter build apk --release
 ```
 
 For Play Store:
 ```bash
-flutter build appbundle --release \
-  --dart-define=SUPABASE_URL=https://YOUR_PROJECT.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
+flutter build appbundle --release
 ```
 
 ## Current product scope
-The app already includes the core real-time data model and primary user workflows. Next production extensions can include maps/place search, trip sharing, push notifications, image storage, offline caching, currency conversion and collaborative trips.
+The app includes the core real-time data model and primary user workflows. Planned production extensions include maps/place search, trip sharing, push notifications, image storage, offline caching, currency conversion and collaborative trips.
