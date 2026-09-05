@@ -53,8 +53,10 @@ class SocialService {
     return client
         .from('friendships')
         .stream(primaryKey: ['id'])
-        .or('requester_id.eq.$userId,addressee_id.eq.$userId')
-        .order('created_at', ascending: false);
+        .order('created_at', ascending: false)
+        .map((rows) => rows
+            .where((row) => row['requester_id'] == userId || row['addressee_id'] == userId)
+            .toList());
   }
 
   Future<void> acceptFriendRequest(String friendshipId) async {
