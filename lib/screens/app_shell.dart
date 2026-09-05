@@ -47,11 +47,11 @@ class _AppShellState extends State<AppShell> {
             labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
             height: 68,
             destinations: [
-              _destination(Icons.home_rounded, Icons.home_outlined, 'Home', 0),
-              _destination(Icons.explore_rounded, Icons.explore_outlined, 'TripVerse', 1),
-              _destination(Icons.group_rounded, Icons.group_outlined, 'Circle', 2),
-              _destination(Icons.chat_bubble_rounded, Icons.chat_bubble_outline_rounded, 'Inbox', 3),
-              _destination(Icons.person_rounded, Icons.person_outline_rounded, 'Profile', 4),
+              _destination(Icons.home_rounded, Icons.home_outlined, 'Home'),
+              _destination(Icons.explore_rounded, Icons.explore_outlined, 'TripVerse'),
+              _destination(Icons.group_rounded, Icons.group_outlined, 'Circle'),
+              _destination(Icons.chat_bubble_rounded, Icons.chat_bubble_outline_rounded, 'Inbox'),
+              _destination(Icons.person_rounded, Icons.person_outline_rounded, 'Profile'),
             ],
           ),
         ),
@@ -59,8 +59,7 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
-  NavigationDestination _destination(IconData selected, IconData normal, String label, int target) {
-    final active = index == target;
+  NavigationDestination _destination(IconData selected, IconData normal, String label) {
     return NavigationDestination(
       label: label,
       icon: Icon(normal, color: Colors.white70, size: 27),
