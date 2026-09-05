@@ -1,4 +1,4 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -67,7 +67,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
                       onDelete: () => _deleteDocument(doc),
                     )),
               const SizedBox(height: 18),
-              _SafetyNote(),
+              const _SafetyNote(),
             ],
           );
         },
@@ -81,16 +81,24 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
   }
 
   Future<void> _pickAndUpload() async {
-    final result = await FilePicker.pickFiles(withData: true, allowMultiple: false);
-    if (result == null || result.files.isEmpty) return;
-    final file = result.files.single;
-    if (file.bytes == null) return;
+    const typeGroup = XTypeGroup(
+      label: 'travel documents',
+      extensions: ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
+    );
+    final file = await openFile(acceptedTypeGroups: const [typeGroup]);
+    if (file == null) return;
+
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) return;
+
+    final fileName = file.name;
+    final extension = fileName.contains('.') ? fileName.split('.').last : null;
 
     if (!mounted) return;
     final details = await showModalBottomSheet<_DocDetails>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => _DocumentDetailsSheet(defaultTitle: file.name),
+      builder: (_) => _DocumentDetailsSheet(defaultTitle: fileName),
     );
     if (details == null) return;
 
@@ -100,9 +108,9 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
         tripId: widget.trip.id,
         title: details.title,
         category: details.category,
-        fileName: file.name,
-        bytes: file.bytes!,
-        mimeType: _mimeFor(file.extension),
+        fileName: fileName,
+        bytes: bytes,
+        mimeType: _mimeFor(extension),
       );
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Document saved securely.')));
     } catch (e) {
@@ -255,6 +263,7 @@ class _InfoCard extends StatelessWidget {
 }
 
 class _SafetyNote extends StatelessWidget {
+  const _SafetyNote();
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(16),
