@@ -1,7 +1,7 @@
 name: tripmate
 description: Real-time smart travel companion built with Flutter and Supabase.
 publish_to: "none"
-version: 1.1.0+2
+version: 1.2.0+3
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -17,6 +17,9 @@ dependencies:
   url_launcher: ^6.3.1
   image_picker: ^1.1.2
   share_plus: ^10.1.4
+  file_picker: ^8.1.7
+  screenshot: ^3.0.0
+  cross_file: ^0.3.4+2
 
 dev_dependencies:
   flutter_test:
