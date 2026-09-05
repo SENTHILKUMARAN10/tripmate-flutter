@@ -81,7 +81,7 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen> {
   }
 
   Future<void> _pickAndUpload() async {
-    final result = await FilePicker.platform.pickFiles(withData: true, allowMultiple: false);
+    final result = await FilePicker.pickFiles(withData: true, allowMultiple: false);
     if (result == null || result.files.isEmpty) return;
     final file = result.files.single;
     if (file.bytes == null) return;
