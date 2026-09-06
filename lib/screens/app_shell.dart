@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme.dart';
+import '../core/design.dart';
 import 'circle_screen.dart';
 import 'explore_screen.dart';
 import 'home_screen.dart';
@@ -38,13 +38,13 @@ class _AppShellState extends State<AppShell> {
     return Scaffold(
       extendBody: true,
       body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 320),
+        duration: const Duration(milliseconds: 330),
         switchInCurve: Curves.easeOutCubic,
         switchOutCurve: Curves.easeInCubic,
         transitionBuilder: (child, animation) => FadeTransition(
           opacity: animation,
           child: SlideTransition(
-            position: Tween<Offset>(begin: const Offset(.025, 0), end: Offset.zero).animate(animation),
+            position: Tween<Offset>(begin: const Offset(.025, .012), end: Offset.zero).animate(animation),
             child: child,
           ),
         ),
@@ -54,14 +54,12 @@ class _AppShellState extends State<AppShell> {
         minimum: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         child: Container(
           height: 74,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppTheme.midnight.withValues(alpha: .96),
+            gradient: TripMateGradient.hero,
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: Colors.white.withValues(alpha: .08)),
-            boxShadow: const [
-              BoxShadow(color: Color(0x400B1020), blurRadius: 30, offset: Offset(0, 14)),
-            ],
+            border: Border.all(color: Colors.white.withValues(alpha: .10)),
+            boxShadow: const [BoxShadow(color: Color(0x3D021024), blurRadius: 30, offset: Offset(0, 14))],
           ),
           child: Row(
             children: List.generate(items.length, (i) {
@@ -80,19 +78,13 @@ class _AppShellState extends State<AppShell> {
                       curve: Curves.easeOutBack,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        gradient: selected
-                            ? const LinearGradient(colors: [AppTheme.violet, Color(0xFF8A7CFF)])
-                            : null,
+                        color: selected ? TripMateColors.ice : Colors.transparent,
                       ),
                       child: Center(
                         child: AnimatedScale(
                           duration: const Duration(milliseconds: 220),
                           scale: selected ? 1.08 : 1,
-                          child: Icon(
-                            item.icon,
-                            size: 25,
-                            color: selected ? Colors.white : Colors.white54,
-                          ),
+                          child: Icon(item.icon, size: 25, color: selected ? TripMateColors.navy950 : Colors.white60),
                         ),
                       ),
                     ),
