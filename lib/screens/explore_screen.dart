@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/design.dart';
 import '../services/social_service.dart';
+import 'genz_tools_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -98,7 +99,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   },
                 ),
                 const SizedBox(height: 26),
-                const TripMatePageHeader(eyebrow: 'FUTURE-NATIVE', title: 'Travel tools that feel new.', subtitle: 'Ideas designed around how Gen-Z actually travels, shares and remembers.'),
+                const TripMatePageHeader(eyebrow: 'FUTURE-NATIVE', title: 'Travel tools that actually work.', subtitle: 'Tap any tool. Each one has its own live trip workspace and syncs through Supabase.'),
                 const SizedBox(height: 14),
                 _futureGrid(),
               ],
@@ -139,12 +140,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   Widget _futureGrid() {
     const items = [
-      (Icons.lock_clock_rounded, 'Time Capsule', 'Seal moments now. Unlock after the trip.'),
-      (Icons.radar_rounded, 'Crew Radar', 'Opt-in proximity for your travel crew.'),
-      (Icons.graphic_eq_rounded, 'MoodMap', 'Turn each place into a visual vibe trail.'),
-      (Icons.auto_awesome_motion_rounded, 'Memory Remix', 'Auto-create a cinematic recap.'),
-      (Icons.local_fire_department_rounded, 'Travel Streaks', 'Challenges, detours and local missions.'),
-      (Icons.bubble_chart_rounded, 'Orbit Rooms', 'Temporary crew rooms that expire after a trip.'),
+      (Icons.lock_clock_rounded, 'Time Capsule', 'Seal moments now. Unlock later.', GenZTool.timeCapsule),
+      (Icons.radar_rounded, 'Crew Radar', 'Live trip crew signals.', GenZTool.crewRadar),
+      (Icons.graphic_eq_rounded, 'MoodMap', 'Map places by how they felt.', GenZTool.moodMap),
+      (Icons.auto_awesome_motion_rounded, 'Memory Remix', 'Build a shareable trip recap.', GenZTool.memoryRemix),
+      (Icons.local_fire_department_rounded, 'Travel Streaks', 'Log challenges and missions.', GenZTool.travelStreaks),
+      (Icons.bubble_chart_rounded, 'Orbit Rooms', 'Trip-specific temporary spaces.', GenZTool.orbitRooms),
     ];
     return GridView.builder(
       shrinkWrap: true,
@@ -154,8 +155,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
       itemBuilder: (_, i) {
         final x = items[i];
         return TripMateSurface(
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => GenZToolScreen(tool: x.$4))),
           padding: const EdgeInsets.all(15),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [TripMateIconBubble(x.$1, size: 44), const Spacer(), Text(x.$2, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)), const SizedBox(height: 3), Text(x.$3, maxLines: 2, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall)]),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [TripMateIconBubble(x.$1, size: 44), const Spacer(), Text(x.$2, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)), const SizedBox(height: 3), Text(x.$3, maxLines: 2, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall), const SizedBox(height: 5), const Align(alignment: Alignment.centerRight, child: Icon(Icons.arrow_outward_rounded, size: 17, color: TripMateColors.blue600))]),
         );
       },
     );
