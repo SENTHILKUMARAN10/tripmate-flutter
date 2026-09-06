@@ -24,11 +24,10 @@ jobs:
       - name: Install Android API 36
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" || true
 
-      - name: Configure Android and TripMate launcher icon
+      - name: Configure Android API 36 and internet permission
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import struct, zlib, math
 
           manifest = Path('android/app/src/main/AndroidManifest.xml')
           text = manifest.read_text()
@@ -38,67 +37,12 @@ jobs:
                   '<manifest xmlns:android="http://schemas.android.com/apk/res/android">',
                   '<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    ' + permission,
               )
-          text = text.replace('android:label="tripmate"', 'android:label="TripMate"')
           manifest.write_text(text)
 
           app_gradle = Path('android/app/build.gradle.kts')
-          gradle = app_gradle.read_text().replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 36')
+          gradle = app_gradle.read_text()
+          gradle = gradle.replace('compileSdk = flutter.compileSdkVersion', 'compileSdk = 36')
           app_gradle.write_text(gradle)
-
-          def png_bytes(size):
-              bg = (7, 19, 38, 255)
-              blue = (90, 169, 230, 255)
-              ice = (221, 243, 255, 255)
-              white = (255, 255, 255, 255)
-              px = [[bg for _ in range(size)] for _ in range(size)]
-
-              # soft circular glow
-              cx, cy = size*.63, size*.28
-              r = size*.48
-              for y in range(size):
-                  for x in range(size):
-                      d = math.hypot(x-cx, y-cy)
-                      if d < r:
-                          a = max(0.0, 1-d/r) * .18
-                          b = px[y][x]
-                          px[y][x] = tuple(int(b[i]*(1-a)+blue[i]*a) for i in range(3)) + (255,)
-
-              def inside(poly, x, y):
-                  hit = False
-                  j = len(poly)-1
-                  for i in range(len(poly)):
-                      xi, yi = poly[i]; xj, yj = poly[j]
-                      if ((yi>y)!=(yj>y)) and x < (xj-xi)*(y-yi)/(yj-yi+1e-9)+xi:
-                          hit = not hit
-                      j = i
-                  return hit
-
-              upper = [(size*.18,size*.29),(size*.64,size*.10),(size*.79,size*.24),(size*.35,size*.54)]
-              lower = [(size*.35,size*.54),(size*.60,size*.40),(size*.84,size*.75),(size*.61,size*.88)]
-              for y in range(size):
-                  for x in range(size):
-                      if inside(upper,x,y): px[y][x] = ice
-                      if inside(lower,x,y): px[y][x] = white
-              rr = size*.055
-              dx, dy = size*.25, size*.74
-              for y in range(size):
-                  for x in range(size):
-                      if (x-dx)**2 + (y-dy)**2 <= rr**2:
-                          px[y][x] = blue
-
-              raw = bytearray()
-              for row in px:
-                  raw.append(0)
-                  for p in row: raw.extend(bytes(p))
-              def chunk(kind, data):
-                  return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind+data)&0xffffffff)
-              return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', size,size,8,6,0,0,0)) + chunk(b'IDAT', zlib.compress(bytes(raw),9)) + chunk(b'IEND', b'')
-
-          sizes = {'mdpi':48,'hdpi':72,'xhdpi':96,'xxhdpi':144,'xxxhdpi':192}
-          for density, size in sizes.items():
-              out = Path(f'android/app/src/main/res/mipmap-{density}/ic_launcher.png')
-              out.parent.mkdir(parents=True, exist_ok=True)
-              out.write_bytes(png_bytes(size))
           PY
 
       - name: Remove generated sample test
