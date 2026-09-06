@@ -43,7 +43,7 @@ class AppTheme {
         headlineMedium: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -.9, color: TripMateColors.text),
         headlineSmall: const TextStyle(fontSize: 23, fontWeight: FontWeight.w900, letterSpacing: -.55, color: TripMateColors.text),
         titleLarge: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: -.3, color: TripMateColors.text),
-        titleMedium: const TextStyle(fontSize: 16, fontWeight: FontWeight.w850, color: TripMateColors.text),
+        titleMedium: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: TripMateColors.text),
         bodyLarge: const TextStyle(fontSize: 16, height: 1.5, color: TripMateColors.text, fontWeight: FontWeight.w500),
         bodyMedium: const TextStyle(fontSize: 14, height: 1.48, color: TripMateColors.muted, fontWeight: FontWeight.w500),
         bodySmall: const TextStyle(fontSize: 12, height: 1.4, color: Color(0xFF8290A4), fontWeight: FontWeight.w500),
@@ -101,11 +101,11 @@ class AppTheme {
           side: const BorderSide(color: Color(0xFFD8E3ED)),
           backgroundColor: Colors.white.withValues(alpha: .72),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          textStyle: const TextStyle(fontWeight: FontWeight.w850),
+          textStyle: const TextStyle(fontWeight: FontWeight.w800),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: TripMateColors.blue700, textStyle: const TextStyle(fontWeight: FontWeight.w850)),
+        style: TextButton.styleFrom(foregroundColor: TripMateColors.blue700, textStyle: const TextStyle(fontWeight: FontWeight.w800)),
       ),
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
